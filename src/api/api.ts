@@ -1,15 +1,11 @@
-import { HttpClient, Api, JettonsBalances } from 'tonapi-sdk-js';
-import * as dotenv from "dotenv";
-dotenv.config();
+import { HttpClient, Api, JettonsBalances, Account } from 'tonapi-sdk-js';
 
-export async function getTokenApi(network: string) {
-    // Configure the HTTP client with your host and token
-    console.log("network: ", network);
+async function getTokenApi(network: string) {
     const httpClient = new HttpClient({
-        baseUrl: network == "-3" ? 'https://testnet.tonapi.io' : 'https://tonapi.io',
+        baseUrl: network == "-3" ? import.meta.env.VITE_API_TESTNET_URL : import.meta.env.VITE_API_BASE_URL,
         baseApiParams: {
             headers: {
-                Authorization: `Bearer AHLRNAY5KDTVAAIAAAAKKQ4TXOPBVC5IIG26BKHKAVJRN3K7PNHLHKWDROQW4FEKOLFERCY`,
+                Authorization: `Bearer ${import.meta.env.VITE_API_TOKEN}`,
                 'Content-type': 'application/json'
             }
         }
@@ -17,11 +13,16 @@ export async function getTokenApi(network: string) {
 
     // Initialize the API client
     return new Api(httpClient);
-
 }
 
 export async function getTokenLists(address: string, network: string): Promise<JettonsBalances> {
     const api = await getTokenApi(network);
     const lists = api.accounts.getAccountJettonsBalances(address);
     return lists;
+}
+
+export async function getAccount(address: string, network: string): Promise<Account> {
+    const api = await getTokenApi(network);
+    const account = api.accounts.getAccount(address);
+    return account;
 }

@@ -1636,7 +1636,7 @@
     "no-case" "^3.0.4"
     "tslib" "^2.0.3"
 
-"dotenv@^16.1.4", "dotenv@^16.4.5":
+"dotenv@^16.1.4":
   "integrity" "sha512-ZmdL2rui+eB2YwhsWzjInR8LldtZHGDoQ1ugH85ppHKwpUHL7j7rN0Ti9NCnGiQbhaZ11FpR+7ao1dNsmduNUg=="
   "resolved" "https://registry.npmjs.org/dotenv/-/dotenv-16.4.5.tgz"
   "version" "16.4.5"
@@ -3625,7 +3625,7 @@
   "resolved" "https://registry.npmjs.org/tr46/-/tr46-0.0.3.tgz"
   "version" "0.0.3"
 
-"ts-node@^10.9.1":
+"ts-node@^10.9.1", "ts-node@^10.9.2":
   "integrity" "sha512-f0FFpIdcHgn8zcPSbf1dRevwt047YMnaiJM3u2w2RewrB+fob/zePZcrOyQoLMMO7aBIddLcQIEK5dYjkLnGrQ=="
   "resolved" "https://registry.npmjs.org/ts-node/-/ts-node-10.9.2.tgz"
   "version" "10.9.2"

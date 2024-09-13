@@ -1,7 +1,8 @@
-import { HttpClient, Api, JettonsBalances, Account } from 'tonapi-sdk-js';
+import { TonApiClient, Api, JettonsBalances, Account } from '@ton-api/client';
+import { Address } from '@ton/core';
 
 async function getTokenApi(network: string) {
-    const httpClient = new HttpClient({
+    const httpClient = new TonApiClient({
         baseUrl: network == "-3" ? import.meta.env.VITE_API_TESTNET_URL : import.meta.env.VITE_API_BASE_URL,
         baseApiParams: {
             headers: {
@@ -17,12 +18,12 @@ async function getTokenApi(network: string) {
 
 export async function getTokenLists(address: string, network: string): Promise<JettonsBalances> {
     const api = await getTokenApi(network);
-    const lists = api.accounts.getAccountJettonsBalances(address);
+    const lists = api.accounts.getAccountJettonsBalances(Address.parse(address));
     return lists;
 }
 
 export async function getAccount(address: string, network: string): Promise<Account> {
     const api = await getTokenApi(network);
-    const account = api.accounts.getAccount(address);
+    const account = api.accounts.getAccount(Address.parse(address));
     return account;
 }

@@ -3,18 +3,18 @@ import { toNano, fromNano } from "ton";
 import { TonClient4 } from "@ton/ton";
 import { useTonConnect } from "../hooks/useTonConnect";
 import { Card, FlexBoxCol, FlexBoxRow, Button, Input, Select, Option, Label } from "./styled/styled";
-import { useIsConnectionRestored, useTonConnectUI, toUserFriendlyAddress } from '@tonconnect/ui-react';
+import { useTonConnectUI } from '@tonconnect/ui-react';
 //----------------------------------------------
 import { getTokenLists, getAccount } from "../api/api";
 import { JettonBalance } from '@ton-api/client';
 import axios from 'axios';
-import { sendJetton, strToCell } from '../hooks/useSendJetton';
+import { strToCell } from '../hooks/useSendJetton';
 import { Address, beginCell } from "@ton/core";
 import * as Jetton from "../contracts/tact_SampleJetton";
-import { JettonDefaultWallet, storeTokenTransfer, TokenTransfer } from "../contracts/tact_JettonDefaultWallet";
+import { storeTokenTransfer } from "../contracts/tact_JettonDefaultWallet";
 import { CHAIN } from "@tonconnect/protocol";
 import * as Factory from "../contracts/tact_factory";
-import { getHttpEndpoint, getHttpV4Endpoint } from "@orbs-network/ton-access";
+import { getHttpV4Endpoint } from "@orbs-network/ton-access";
 
 export function SendEnvelope() {
   const { sender, connected, network } = useTonConnect();
@@ -132,6 +132,7 @@ export function SendEnvelope() {
             // 计算wallet地址
             const jetton = client.open(Jetton.SampleJetton.fromAddress(jettonAddress));
             const packageWallet = await jetton.getGetWalletAddress(packageAddress);
+            console.log(packageWallet.toString());
 
             // 发送消息和jetton
             // tx1
@@ -187,35 +188,9 @@ export function SendEnvelope() {
               ac = await getAccount(packageAddress.toString(), network as string);
               console.log(attempt, ac.status);
               attempt++;
-            
-              if (ac.status === 'active' || attempt >= 20) {
+
+              if (ac.status == 'active' || attempt >= 20) {
                 clearInterval(intervalId);
-                // 发送红包信息给服务器
-                const active = async () => {
-                  try {
-                    const response = await axios.post(
-                      'http://101.32.218.251:3000/NewEnvelope',
-                      {
-                        sender: tonConnectUI.account?.address as string,
-                        network: network,
-                        token: jettonAddress,
-                        amount: realAmount,
-                        size: size,
-                        decimals: decimal,
-                        chatId: chatId,
-                        redPackageAddress: packageAddress.toString(),
-                      },
-                      {
-                        headers: {
-                          'Content-Type': 'application/json' // 手动设置Content-Type
-                        }
-                      }
-                    );
-                    console.log(response.data);
-                  } catch (error) {
-                    console.error('Failed to send info to server:', error);
-                  }
-                }
                 if (ac.status == 'active') {
                   console.log('Account is active');
                   await active();
@@ -224,10 +199,52 @@ export function SendEnvelope() {
                 }
               }
             }, 2000);
+
+            const info = {
+              sender: tonConnectUI.account?.address as string,
+              network: network == CHAIN.MAINNET ? 'mainnet' : 'testnet',
+              token: jettonAddress.toString(),
+              amount: Number(realAmount),
+              size: size,
+              decimals: decimal,
+              chatId: chatId,
+              redPackageAddress: packageAddress.toString(),
+            }
+
+            const active = async () => {
+              console.log(info);
+              try {
+                // 发送红包信息给服务器
+                const response = await axios.post(
+                  'http://101.32.218.251:3000/NewEnvelope',
+                  {
+                    sender: tonConnectUI.account?.address as string,
+                    network: network == CHAIN.MAINNET ? 'mainnet' : 'testnet',
+                    token: jettonAddress.toString(),
+                    amount: Number(realAmount),
+                    size: size,
+                    decimals: decimal,
+                    chatId: chatId,
+                    redPackageAddress: packageAddress.toString(),
+                  },
+                  {
+                    headers: {
+                      'Content-Type': 'application/json' // 手动设置Content-Type
+                    }
+                  }
+                );
+                console.log(response.data);
+                
+              } catch (error) {
+                console.error('Failed to send info to server:', error);
+              }
+            }
+
           }}
         >
           Send
         </Button>
+
       </FlexBoxCol>
 
     </Card>
